@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Reel Downloader</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-top: 40px;
+        }
+        
+        header {
+            background: linear-gradient(to right, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .url-input {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .url-input:focus {
+            border-color: #833ab4;
+            outline: none;
+        }
+        
+        .download-btn {
+            background: linear-gradient(to right, #405de6, #833ab4);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .download-btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-section {
+            display: none;
+            margin-top: 30px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .video-container {
+            margin: 20px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .video-container video {
+            width: 100%;
+            display: block;
+        }
+        
+        .download-link {
+            display: inline-block;
+            background: linear-gradient(to right, #405de6, #833ab4);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: transform 0.2s;
+        }
+        
+        .download-link:hover {
+            transform: translateY(-2px);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #833ab4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            display: none;
+            background-color: #ffe6e6;
+            color: #d63031;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 15px;
+            color: #405de6;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: white;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                margin-top: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Instagram Reel Downloader</h1>
+            <p class="description">Download any Instagram Reel quickly and easily. Just paste the URL and get your video!</p>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <input type="text" class="url-input" id="reelUrl" placeholder="Paste Instagram Reel URL here...">
+                <button class="download-btn" id="downloadBtn">Download Reel</button>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing your request...</p>
+            </div>
+            
+            <div class="error-message" id="errorMessage">
+                <p>An error occurred. Please check the URL and try again.</p>
+            </div>
+            
+            <div class="result-section" id="resultSection">
+                <h2>Your Reel is Ready!</h2>
+                <div class="video-container">
+                    <video id="videoPlayer" controls>
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <a href="#" class="download-link" id="downloadLink" download>Download Video</a>
+            </div>
+            
+            <div class="instructions">
+                <h3>How to Use:</h3>
+                <ol>
+                    <li>Open Instagram and find the Reel you want to download</li>
+                    <li>Tap the three dots (⋯) in the bottom right corner of the Reel</li>
+                    <li>Select "Copy Link" from the menu</li>
+                    <li>Paste the link in the input field above and click "Download Reel"</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 Instagram Reel Downloader | For Educational Purposes</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const reelUrlInput = document.getElementById('reelUrl');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('errorMessage');
+            const resultSection = document.getElementById('resultSection');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const downloadLink = document.getElementById('downloadLink');
+            
+            // Focus on URL input when page loads
+            reelUrlInput.focus();
+            
+            downloadBtn.addEventListener('click', function() {
+                const reelUrl = reelUrlInput.value.trim();
+                
+                if (!reelUrl) {
+                    showError('Please enter an Instagram Reel URL');
+                    return;
+                }
+                
+                if (!isValidInstagramUrl(reelUrl)) {
+                    showError('Please enter a valid Instagram Reel URL');
+                    return;
+                }
+                
+                // Show loading, hide other sections
+                loading.style.display = 'block';
+                errorMessage.style.display = 'none';
+                resultSection.style.display = 'none';
+                
+                // Simulate processing (in a real app, this would call an API)
+                setTimeout(() => {
+                    processReelDownload(reelUrl);
+                }, 1500);
+            });
+            
+            function isValidInstagramUrl(url) {
+                const instagramRegex = /https?:\/\/(www\.)?instagram\.com\/(p|reel)\/([^/?#&]+).*/;
+                return instagramRegex.test(url);
+            }
+            
+            function processReelDownload(url) {
+                // In a real implementation, this would call a backend service
+                // For this demo, we'll simulate a successful download
+                
+                // Hide loading
+                loading.style.display = 'none';
+                
+                // For demo purposes, we'll use a sample video
+                const sampleVideoUrl = 'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-1232-large.mp4';
+                
+                // Set video source and download link
+                videoPlayer.src = sampleVideoUrl;
+                downloadLink.href = sampleVideoUrl;
+                
+                // Show result section
+                resultSection.style.display = 'block';
+                
+                // Scroll to result
+                resultSection.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            function showError(message) {
+                errorMessage.querySelector('p').textContent = message;
+                errorMessage.style.display = 'block';
+                resultSection.style.display = 'none';
+                loading.style.display = 'none';
+            }
+            
+            // Allow pressing Enter to trigger download
+            reelUrlInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    downloadBtn.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
